@@ -1,0 +1,22 @@
+{
+  "name": "adsb-tv",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Apple TV + Windows ADS-B viewer for local PiAware feeders",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @adsb/web",
+    "dev:web": "npm run dev --workspace @adsb/web",
+    "dev:proxy": "npm run dev --workspace @adsb/piaware-proxy",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

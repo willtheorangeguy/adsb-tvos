@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+*.log
+apps/web/dist
+apps/proxy/dist
+packages/shared/dist
