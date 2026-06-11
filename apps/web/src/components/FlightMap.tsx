@@ -1,7 +1,9 @@
-import { Fragment, useMemo } from "react";
-import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip } from "react-leaflet";
+import { Fragment, useEffect, useMemo, useRef } from "react";
+import { CircleMarker, MapContainer, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet";
 
-import type { TrackedAircraft } from "@adsb/shared";
+import { approximateLocationFromAircraft, type LatLon, type TrackedAircraft } from "@adsb/shared";
+
+const US_GEOGRAPHIC_CENTER = [39.8283, -98.5795] as [number, number];
 
 interface FlightMapProps {
   aircraft: TrackedAircraft[];
@@ -39,27 +41,39 @@ function headingEndpoint(
   };
 }
 
+/**
+ * Re-centers the live map on the receiver's approximate location once it becomes
+ * known. MapContainer only honors its `center` prop on the initial mount, so the
+ * map starts on the US fallback before any feed data arrives and must be moved
+ * imperatively afterward. Runs once so it never fights the user panning the map.
+ */
+function HomeView({ home }: { home?: LatLon }) {
+  const map = useMap();
+  const hasCentered = useRef(false);
+
+  useEffect(() => {
+    if (hasCentered.current || !home) {
+      return;
+    }
+
+    map.setView([home.lat, home.lon], map.getZoom());
+    hasCentered.current = true;
+  }, [home, map]);
+
+  return null;
+}
+
 export function FlightMap({ aircraft, selectedHex, receiver, onSelectAircraft }: FlightMapProps) {
-  const center = useMemo(() => {
-    const selected = aircraft.find((item) => item.hex === selectedHex && item.position);
-    if (selected?.position) {
-      return [selected.position.lat, selected.position.lon] as [number, number];
-    }
-
-    if (receiver) {
-      return [receiver.lat, receiver.lon] as [number, number];
-    }
-
-    const first = aircraft.find((item) => item.position);
-    if (first?.position) {
-      return [first.position.lat, first.position.lon] as [number, number];
-    }
-
-    return [39.8283, -98.5795] as [number, number];
-  }, [aircraft, receiver, selectedHex]);
+  // The receiver report is the most precise home location; otherwise derive an
+  // approximate location from where the tracked aircraft are clustered.
+  const home = useMemo<LatLon | undefined>(
+    () => receiver ?? approximateLocationFromAircraft(aircraft),
+    [aircraft, receiver],
+  );
 
   return (
-    <MapContainer center={center} zoom={8} minZoom={3} maxZoom={14} scrollWheelZoom className="flight-map">
+    <MapContainer center={US_GEOGRAPHIC_CENTER} zoom={8} minZoom={3} maxZoom={14} scrollWheelZoom className="flight-map">
+      <HomeView home={home} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

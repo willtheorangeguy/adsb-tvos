@@ -127,6 +127,41 @@ export function mergeTrackingState(
   };
 }
 
+function median(sortedValues: number[]): number {
+  const middle = Math.floor(sortedValues.length / 2);
+
+  if (sortedValues.length % 2 === 0) {
+    return (sortedValues[middle - 1]! + sortedValues[middle]!) / 2;
+  }
+
+  return sortedValues[middle]!;
+}
+
+/**
+ * Estimates the receiver's approximate location from the aircraft it is tracking.
+ *
+ * Uses the median latitude/longitude so a single far-off aircraft cannot drag the
+ * estimate away from the cluster of traffic near the receiver. Returns undefined
+ * when no aircraft report a position.
+ */
+export function approximateLocationFromAircraft(aircraft: TrackedAircraft[]): LatLon | undefined {
+  const positions = aircraft
+    .map((item) => item.position)
+    .filter((position): position is LatLon => position !== undefined);
+
+  if (positions.length === 0) {
+    return undefined;
+  }
+
+  const lats = positions.map((position) => position.lat).sort((left, right) => left - right);
+  const lons = positions.map((position) => position.lon).sort((left, right) => left - right);
+
+  return {
+    lat: median(lats),
+    lon: median(lons),
+  };
+}
+
 export function receiverFromPayload(payload: unknown): LatLon | undefined {
   if (!payload || typeof payload !== "object") {
     return undefined;
