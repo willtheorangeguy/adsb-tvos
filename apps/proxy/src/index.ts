@@ -28,6 +28,14 @@ async function readPiAwareJson(path: string): Promise<unknown> {
   return response.json();
 }
 
+app.get("/", (_req, res) => {
+  res.json({
+    name: "PiAware proxy",
+    upstream: baseUrl,
+    endpoints: ["/api/health", "/api/aircraft", "/api/receiver", "/api/history"],
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,

@@ -29,8 +29,13 @@ Web app env vars (`apps/web/.env.local`):
 
 Proxy env vars (`apps/proxy/.env` or shell):
 
-- `PIAWARE_BASE_URL=http://piaware.local`
+- `PIAWARE_BASE_URL=http://piaware.local` — the **host root** of your feeder, with
+  no `/skyaware/` path and not the Beast port `30005`. Take your SkyAware browser
+  URL and drop the trailing `/skyaware/`. The proxy appends the data paths itself.
 - `PORT=7070`
+
+See [`apps/proxy/README.md`](apps/proxy/README.md) for the full endpoint list and
+troubleshooting (e.g. why hitting `/` returns `Cannot GET /`).
 
 ## tvOS development notes
 
