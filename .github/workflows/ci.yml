@@ -87,7 +87,7 @@ jobs:
         run: node .github/scripts/screenshot.mjs
 
       - name: Upload screenshot
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tvos-ui-preview
           path: screenshots/
