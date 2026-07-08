@@ -1,12 +1,9 @@
 {
+  "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["react-native"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["App.tsx", "src/**/*.ts", "src/**/*.tsx"]
 }

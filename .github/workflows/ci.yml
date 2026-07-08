@@ -47,11 +47,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # apps/tvos is a self-contained React Native project (not a root workspace,
+      # to avoid npm hoisting breaking the native build), so it installs its own
+      # deps and consumes the built @adsb/shared package.
+      - name: Build shared package
+        run: npm run build --workspace @adsb/shared
+
+      - name: Install tvOS app dependencies
+        run: npm ci
+        working-directory: apps/tvos
+
       - name: Typecheck tvOS
-        run: npm run typecheck --workspace @adsb/tvos
+        run: npm run typecheck
+        working-directory: apps/tvos
 
       - name: Test tvOS
-        run: npm run test --workspace @adsb/tvos
+        run: npm run test
+        working-directory: apps/tvos
 
   screenshot:
     runs-on: ubuntu-latest

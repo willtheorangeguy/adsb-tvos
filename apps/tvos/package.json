@@ -2,18 +2,40 @@
   "name": "@adsb/tvos",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@adsb/shared": "file:../../packages/shared",
-    "react": "^19.2.4"
+    "react": "18.3.1",
+    "react-native": "npm:react-native-tvos@0.76.0-0"
+  },
+  "overrides": {
+    "react-native-tvos": "0.76.0-0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.2",
-    "typescript": "^6.0.3",
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "15.0.0-alpha.2",
+    "@react-native-community/cli-platform-android": "15.0.0-alpha.2",
+    "@react-native-community/cli-platform-ios": "15.0.0-alpha.2",
+    "@react-native/babel-preset": "0.76.0-rc.6",
+    "@react-native/eslint-config": "0.76.0-rc.6",
+    "@react-native/metro-config": "0.76.0-rc.6",
+    "@react-native/typescript-config": "0.76.0-rc.6",
+    "@types/react": "^18.2.6",
+    "eslint": "^8.19.0",
+    "prettier": "2.8.8",
+    "typescript": "5.0.4",
     "vitest": "^4.1.4"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

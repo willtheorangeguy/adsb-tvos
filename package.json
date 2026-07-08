@@ -4,7 +4,8 @@
   "private": true,
   "description": "Apple TV + Windows ADS-B viewer for local PiAware feeders",
   "workspaces": [
-    "apps/*",
+    "apps/web",
+    "apps/proxy",
     "packages/*"
   ],
   "scripts": {
