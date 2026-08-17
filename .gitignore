@@ -5,3 +5,5 @@ coverage
 apps/web/dist
 apps/proxy/dist
 packages/shared/dist
+.bandit/
+.recall/
