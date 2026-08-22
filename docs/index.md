@@ -3,10 +3,10 @@
 An ADS-B aircraft viewer for a local PiAware feeder, built as a monorepo so the tracking logic
 can be developed on Windows and shipped to Apple TV.
 
-```
+```text
 adsb-tvos/
 ├── docs/
-│   ├── README.md          this page
+│   ├── index.md           this page
 │   ├── quickstart.md      three commands to a map
 │   ├── installation.md    prerequisites and setup
 │   ├── configuration.md   every environment variable
@@ -38,7 +38,7 @@ adsb-tvos/
 
 Three surfaces, one brain:
 
-```
+```text
   apps/web    (Windows-first preview)  ─┐
                                         ├─► packages/shared  ─► PiAware feeder
   apps/tvos   (Apple TV)               ─┘        via apps/proxy

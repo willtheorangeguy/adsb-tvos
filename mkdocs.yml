@@ -1,0 +1,37 @@
+INHERIT: .mkdocs-shared/shared/mkdocs.base.yml
+
+site_name: ADS-B TV Viewer
+site_description: An Apple TV ADS-B viewer for a local PiAware feeder, with a browser preview for development.
+site_author: willtheorangeguy
+site_url: https://williamvdg.me/adsb-tvos/
+
+repo_url: https://github.com/willtheorangeguy/adsb-tvos
+repo_name: willtheorangeguy/adsb-tvos
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; willtheorangeguy
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Installation: installation.md
+  - Configuration: configuration.md
+  - Architecture: architecture.md
+  - Proxy API: api.md
+  - Development:
+      - Development setup: development.md
+      - Testing: testing.md
+      - CI/CD: ci-cd.md
+  - Help:
+      - FAQ: faq.md
+      - Troubleshooting: troubleshooting.md
+      - Roadmap: roadmap.md
+  - About:
+      - License: license.md
+      - Contributing: https://github.com/willtheorangeguy/.github/blob/main/CONTRIBUTING.md
+      - Code of Conduct: https://github.com/willtheorangeguy/.github/blob/main/CODE_OF_CONDUCT.md
+      - Security: https://github.com/willtheorangeguy/.github/blob/main/SECURITY.md
+
+exclude_docs: |
+  docs.instructions.md
+  internal/

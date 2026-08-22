@@ -13,7 +13,7 @@ Two surfaces, two sets of environment variables.
 
 It wants the host root and nothing else:
 
-```
+```ini
 PIAWARE_BASE_URL=http://piaware.local
 ```
 

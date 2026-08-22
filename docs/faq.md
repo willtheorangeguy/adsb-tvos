@@ -31,7 +31,7 @@ After that: confirm the feeder responds, confirm the proxy is running, and remem
 with poor placement genuinely hears nothing sometimes. See
 [Troubleshooting](./troubleshooting.md).
 
-## The proxy says "Cannot GET /".
+## The proxy says "Cannot GET /"
 
 Expected. It exposes data paths, not a landing page. Not a fault.
 

@@ -2,7 +2,7 @@
 
 ## Three surfaces, one shared brain
 
-```
+```text
   apps/web    React + Vite + Leaflet   ─┐
                                         ├─► packages/shared ─► apps/proxy ─► PiAware feeder
   apps/tvos   react-native-tvos        ─┘
@@ -21,7 +21,7 @@ surface, or that property erodes.
 
 ## The shared package
 
-```
+```text
 packages/shared/src/
 ├── types.ts           domain models
 ├── tracker.ts         tracking logic

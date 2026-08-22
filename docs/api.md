@@ -3,7 +3,7 @@
 `apps/proxy` is a thin forwarder in front of your PiAware feeder. It adds no data of its own.
 
 Full endpoint list and troubleshooting live in
-[`apps/proxy/README.md`](../apps/proxy/README.md); this page covers what matters from the
+[`apps/proxy/README.md`](https://github.com/willtheorangeguy/adsb-tvos/blob/HEAD/apps/proxy/README.md); this page covers what matters from the
 outside.
 
 ## What it is for
@@ -17,7 +17,7 @@ The proxy runs on the same origin as the dev server and forwards on your behalf.
 
 ## Configuration
 
-```
+```ini
 PIAWARE_BASE_URL=http://piaware.local
 PORT=7070
 ```

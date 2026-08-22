@@ -8,7 +8,7 @@ Work through these in order — the first accounts for most cases.
 
 It wants the **host root** of your feeder:
 
-```
+```ini
 PIAWARE_BASE_URL=http://piaware.local
 ```
 

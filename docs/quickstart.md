@@ -15,7 +15,7 @@ One install at the root — this is an npm workspace covering `apps/web`, `apps/
 
 Set `PIAWARE_BASE_URL` for the proxy — the **host root**, nothing more:
 
-```
+```ini
 PIAWARE_BASE_URL=http://piaware.local
 PORT=7070
 ```

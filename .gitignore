@@ -7,3 +7,13 @@ apps/proxy/dist
 packages/shared/dist
 .bandit/
 .recall/
+
+# Documentation build artifacts
+site/
+.mkdocs-shared/
+docs/stylesheets/
+docs/javascript/
+docs/images/favicon.svg
+overrides/main.html
+overrides/partials/
+overrides/.icons/
