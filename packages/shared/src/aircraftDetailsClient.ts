@@ -6,6 +6,7 @@ export interface AircraftIdentity {
   registeredOwner?: string;
 }
 export interface AircraftPhoto {
+  aspectRatio?: number;
   url: string;
   credit: string;
   link: string;
@@ -61,7 +62,24 @@ export function parsePhoto(data: unknown): AircraftPhoto | undefined {
       p.link.startsWith("https://www.planespotters.net/photo/")
     ) {
       // Keep API URLs verbatim. Only API thumbnails, never originals.
-      return { url, credit: `© ${credit}`, link: p.link };
+      const size = object(object(p.thumbnail_large ?? p.thumbnail).size);
+      const aspectRatio =
+        typeof size.width === "number" &&
+        typeof size.height === "number" &&
+        size.height > 0
+          ? size.width / size.height
+          : undefined;
+      return {
+        url,
+        credit: `© ${credit}`,
+        link: p.link,
+        ...(aspectRatio &&
+        Number.isFinite(aspectRatio) &&
+        aspectRatio >= 0.25 &&
+        aspectRatio <= 4
+          ? { aspectRatio }
+          : {}),
+      };
     }
   }
   return undefined;

@@ -1,19 +1,11 @@
 import React, {useState} from 'react';
-import {
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {
   aircraftCategory,
   formatAltitude,
   formatDistance,
   formatSpeed,
   proximity,
-  qrMatrix,
   type AircraftDetailsResult,
   type LatLon,
   type TrackedAircraft,
@@ -58,8 +50,6 @@ export function AircraftDetails({
     ? 'Descending'
     : 'Level flight';
   const photo = details?.photo;
-  const matrix =
-    photo && Platform.OS !== 'web' ? qrMatrix(photo.link) : undefined;
   return (
     <ScrollView
       style={s.panel}
@@ -78,36 +68,6 @@ export function AircraftDetails({
             onError={() => setFailedPhoto(photo.url)}
           />
           <Text style={s.credit}>{photo.credit} · Planespotters.net</Text>
-          {matrix && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 18,
-                marginTop: 12,
-              }}>
-              <View style={{padding: 10, backgroundColor: '#fff'}}>
-                {matrix.map((row, i) => (
-                  <View key={i} style={{flexDirection: 'row'}}>
-                    {row.map((dark, j) => (
-                      <View
-                        key={j}
-                        style={{
-                          width: 2.5,
-                          height: 2.5,
-                          backgroundColor: dark ? '#000' : '#fff',
-                        }}
-                      />
-                    ))}
-                  </View>
-                ))}
-              </View>
-              <Text style={[s.muted, {flex: 1}]}>
-                Scan to view the original photo and photographer on
-                Planespotters.net.
-              </Text>
-            </View>
-          )}
         </>
       ) : p.photoUrl &&
         /^https:\/\//.test(p.photoUrl) &&

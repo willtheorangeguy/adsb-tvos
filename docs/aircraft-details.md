@@ -16,7 +16,7 @@ Lookups wait 350 ms after selection, share in-flight requests, and cache JSON in
 
 ## Photo attribution and handling
 
-Per the [photo API terms](https://www.planespotters.net/photo/api), photos remain free to all app users, carry visible photographer credit, and use the exact API thumbnail/source URLs. The browser thumbnail is a plain link to the original photo. Apple TV displays an adjacent QR code to the same page. Only API thumbnails are displayed; no full-resolution scraping, image proxy, photo export, or photo persistence is implemented. Photo metadata is not included in saved sightings.
+Per the [photo API terms](https://www.planespotters.net/photo/api), photos remain free to all app users, carry visible photographer credit, and use the exact API thumbnail/source URLs. The browser thumbnail is a plain link to the original photo. Apple TV displays the photographer credit beneath the photo; the photo QR overlay has been removed. Only API thumbnails are displayed; no full-resolution scraping, image proxy, photo export, or photo persistence is implemented. Photo metadata is not included in saved sightings.
 
 Native requests identify the app with `ADSB-TV/0.1 (+https://github.com/willtheorangeguy/adsb-tvos)`. Browser requests use normal browser Origin/Referer headers. Native thumbnails download directly into a dedicated image view using an ephemeral URL session without a disk or React Native image cache. API JSON is held only in memory for at most one hour, below the provider’s 24-hour limit.
 

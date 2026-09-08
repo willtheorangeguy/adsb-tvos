@@ -40,11 +40,20 @@ final class RemoteNavigationTests: XCTestCase {
         XCTAssertTrue(app.buttons["Explore demo"].hasFocus || app.buttons["Local receiver"].hasFocus,
                       "Down from the Settings menu must enter the form.")
         let save = app.buttons["Save settings"]
+        var reachedConnection = false
+        var reachedRefresh = false
+        var reachedDetails = false
         for _ in 0..<14 {
+            reachedConnection = reachedConnection || app.buttons["Direct"].hasFocus || app.buttons["Local proxy"].hasFocus
+            reachedRefresh = reachedRefresh || app.buttons["1 seconds"].hasFocus || app.buttons["2 seconds"].hasFocus || app.buttons["5 seconds"].hasFocus
+            reachedDetails = reachedDetails || app.buttons["Online details"].hasFocus || app.buttons["Local only"].hasFocus
             if save.hasFocus { break }
             if app.buttons["Cancel"].hasFocus { remote.press(.left) }
             else { remote.press(.down) }
         }
+        XCTAssertTrue(reachedConnection, "The form controls must be focusable.")
+        XCTAssertTrue(reachedRefresh, "The remote must reach rows below the initial viewport.")
+        XCTAssertTrue(reachedDetails, "The last settings row must remain reachable above the fixed footer.")
         XCTAssertTrue(save.hasFocus, "Save must be reachable without a pointer or swipe.")
         XCTAssertTrue(save.isHittable)
         remote.press(.select)
