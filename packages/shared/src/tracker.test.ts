@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { approximateLocationFromAircraft, mergeTrackingState } from "./tracker.js";
+import {
+  approximateLocationFromAircraft,
+  mergeTrackingState,
+} from "./tracker.js";
 
 import type { TrackedAircraft } from "./types.js";
 
-function trackedAt(hex: string, position?: { lat: number; lon: number }): TrackedAircraft {
+function trackedAt(
+  hex: string,
+  position?: { lat: number; lon: number }
+): TrackedAircraft {
   return {
     hex,
     position,
@@ -24,7 +30,7 @@ describe("mergeTrackingState", () => {
         aircraft: [{ hex: "abc123", lat: 40, lon: -75, seen: 0 }],
       },
       { maxTrailPoints: 10 },
-      { lat: 40, lon: -75 },
+      { lat: 40, lon: -75 }
     );
 
     const second = mergeTrackingState(
@@ -34,7 +40,7 @@ describe("mergeTrackingState", () => {
         aircraft: [{ hex: "abc123", lat: 40.01, lon: -75.01, seen: 0 }],
       },
       { maxTrailPoints: 10 },
-      { lat: 40, lon: -75 },
+      { lat: 40, lon: -75 }
     );
 
     expect(second.aircraft[0]?.trail).toHaveLength(2);
@@ -45,7 +51,9 @@ describe("mergeTrackingState", () => {
 describe("approximateLocationFromAircraft", () => {
   it("returns undefined when no aircraft report a position", () => {
     expect(approximateLocationFromAircraft([])).toBeUndefined();
-    expect(approximateLocationFromAircraft([trackedAt("abc123")])).toBeUndefined();
+    expect(
+      approximateLocationFromAircraft([trackedAt("abc123")])
+    ).toBeUndefined();
   });
 
   it("estimates a location near a cluster of aircraft", () => {
@@ -75,4 +83,18 @@ describe("approximateLocationFromAircraft", () => {
     expect(location?.lat).toBeGreaterThan(50);
     expect(location?.lon).toBeLessThan(-113);
   });
+});
+
+it("keeps aircraft identity when later messages omit it", () => {
+  const first = mergeTrackingState(undefined, {
+    sourceTimestampMs: 1000,
+    aircraft: [{ hex: "ABC123", flight: "TEST1", r: "N123", t: "C172" }],
+  });
+  const next = mergeTrackingState(first, {
+    sourceTimestampMs: 2000,
+    aircraft: [{ hex: "ABC123", gs: 100 }],
+  });
+  expect(next.aircraft[0]?.callsign).toBe("TEST1");
+  expect(next.aircraft[0]?.registration).toBe("N123");
+  expect(next.aircraft[0]?.aircraftType).toBe("C172");
 });

@@ -1,236 +1,209 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import type {PiAwareMode} from '@adsb/shared';
-
 import {POLL_OPTIONS_MS, type AppConfig} from '../config';
-import {theme} from '../theme';
-
-interface SettingsOverlayProps {
+import {TVButton} from './TVButton';
+export function SettingsOverlay({
+  initial,
+  onSave,
+  onCancel,
+}: {
   initial: AppConfig;
-  firstRun: boolean;
+  firstRun?: boolean;
   onSave: (config: AppConfig) => void;
   onCancel: () => void;
-}
-
-interface FocusButtonProps {
-  label: string;
-  onPress: () => void;
-  selected?: boolean;
-  primary?: boolean;
-  hasTVPreferredFocus?: boolean;
-}
-
-function FocusButton({label, onPress, selected, primary, hasTVPreferredFocus}: FocusButtonProps) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      hasTVPreferredFocus={hasTVPreferredFocus}
-      onPress={onPress}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      style={[
-        styles.button,
-        primary && styles.buttonPrimary,
-        selected && styles.buttonSelected,
-        focused && styles.buttonFocused,
-      ]}>
-      <Text style={[styles.buttonText, (selected || primary) && styles.buttonTextStrong]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-function Field({label, hint, children}: {label: string; hint?: string; children: React.ReactNode}) {
-  return (
-    <View style={styles.field}>
-      <View style={styles.fieldLabelBlock}>
-        <Text style={styles.fieldLabel}>{label}</Text>
-        {hint ? <Text style={styles.fieldHint}>{hint}</Text> : null}
-      </View>
-      <View style={styles.fieldControl}>{children}</View>
-    </View>
-  );
-}
-
-export function SettingsOverlay({initial, firstRun, onSave, onCancel}: SettingsOverlayProps) {
+}) {
   const [demo, setDemo] = useState(initial.demo);
   const [mode, setMode] = useState<PiAwareMode>(initial.mode);
   const [baseUrl, setBaseUrl] = useState(initial.baseUrl);
   const [pollMs, setPollMs] = useState(initial.pollMs);
-  const [urlFocused, setUrlFocused] = useState(false);
-
+  const [lat, setLat] = useState(initial.latitude?.toString() ?? '');
+  const [lon, setLon] = useState(initial.longitude?.toString() ?? '');
+  const [error, setError] = useState('');
   const save = () => {
-    const trimmed = baseUrl.trim();
-    onSave({demo, mode, baseUrl: trimmed || initial.baseUrl, pollMs});
+    if (!/^https?:\/\/[^\s/]+(?::\d+)?(?:\/[^\s]*)?$/i.test(baseUrl.trim())) {
+      setError('Enter a complete http:// or https:// receiver address.');
+      return;
+    }
+    if (
+      (lat.trim() || lon.trim()) &&
+      (!lat.trim() ||
+        !lon.trim() ||
+        !Number.isFinite(Number(lat)) ||
+        !Number.isFinite(Number(lon)) ||
+        Math.abs(Number(lat)) > 90 ||
+        Math.abs(Number(lon)) > 180)
+    ) {
+      setError(
+        'Enter both coordinates: latitude −90 to 90, longitude −180 to 180.',
+      );
+      return;
+    }
+    onSave({
+      demo,
+      mode,
+      baseUrl: baseUrl.trim().replace(/\/$/, ''),
+      pollMs,
+      latitude: lat.trim() ? Number(lat) : undefined,
+      longitude: lon.trim() ? Number(lon) : undefined,
+    });
   };
-
   return (
-    <View style={styles.root}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>
-          {firstRun
-            ? 'Welcome! Point the app at your PiAware feeder, or explore with demo data.'
-            : 'Configure how the app connects to your PiAware feeder.'}
+    <ScrollView style={s.root} contentContainerStyle={s.content}>
+      <View style={s.card}>
+        <Text style={s.eyebrow}>MAKE YOURSELF AT HOME</Text>
+        <Text style={s.title}>Your receiver. Your sky.</Text>
+        <Text style={s.subtitle}>
+          Connect a PiAware, dump1090 or readsb receiver on your local network.
         </Text>
-
-        <Field label="Data source" hint="Demo shows synthetic traffic without a feeder.">
-          <FocusButton
-            label="Demo data"
-            selected={demo}
-            hasTVPreferredFocus
+        <Field
+          title="Data source"
+          hint="Demo traffic is synthetic and stays separate from your real sightings.">
+          <TVButton
+            label="Explore demo"
+            active={demo}
             onPress={() => setDemo(true)}
           />
-          <FocusButton label="Live feeder" selected={!demo} onPress={() => setDemo(false)} />
+          <TVButton
+            label="Local receiver"
+            active={!demo}
+            onPress={() => setDemo(false)}
+          />
         </Field>
-
-        <Field label="Connection mode" hint="Direct talks to the feeder; Proxy uses the CORS proxy.">
-          <FocusButton label="Direct" selected={mode === 'direct'} onPress={() => setMode('direct')} />
-          <FocusButton label="Proxy" selected={mode === 'proxy'} onPress={() => setMode('proxy')} />
+        <Field
+          title="Connection"
+          hint="Use Direct on Apple TV. For a browser without feeder CORS, use the local proxy.">
+          <TVButton
+            label="Direct"
+            active={mode === 'direct'}
+            onPress={() => setMode('direct')}
+          />
+          <TVButton
+            label="Local proxy"
+            active={mode === 'proxy'}
+            onPress={() => setMode('proxy')}
+          />
         </Field>
-
-        <Field label="Feeder URL" hint="e.g. http://piaware.local or http://192.168.1.50">
+        <Field
+          title="Receiver address"
+          hint="Use the host root, e.g. http://192.168.1.50. Proxy default: http://localhost:7070.">
           <TextInput
-            style={[styles.input, urlFocused && styles.inputFocused]}
+            accessibilityLabel="Receiver address"
+            style={s.input}
             value={baseUrl}
             onChangeText={setBaseUrl}
-            onFocus={() => setUrlFocused(true)}
-            onBlur={() => setUrlFocused(false)}
-            placeholder="http://piaware.local"
-            placeholderTextColor={theme.color.textMuted}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
           />
         </Field>
-
-        <Field label="Poll interval">
-          {POLL_OPTIONS_MS.map((ms) => (
-            <FocusButton
+        <Field
+          title="Receiver location"
+          hint="Optional fallback if your receiver hides its location. Enables range and overhead direction.">
+          <TextInput
+            accessibilityLabel="Receiver latitude"
+            placeholder="Latitude"
+            placeholderTextColor="#657788"
+            style={s.input}
+            value={lat}
+            onChangeText={setLat}
+            keyboardType="numbers-and-punctuation"
+          />
+          <TextInput
+            accessibilityLabel="Receiver longitude"
+            placeholder="Longitude"
+            placeholderTextColor="#657788"
+            style={s.input}
+            value={lon}
+            onChangeText={setLon}
+            keyboardType="numbers-and-punctuation"
+          />
+        </Field>
+        <Field
+          title="Refresh interval"
+          hint="Aircraft update while the app is open.">
+          {POLL_OPTIONS_MS.map(ms => (
+            <TVButton
               key={ms}
-              label={`${ms / 1000}s`}
-              selected={pollMs === ms}
+              label={`${ms / 1000} seconds`}
+              active={pollMs === ms}
               onPress={() => setPollMs(ms)}
             />
           ))}
         </Field>
-
-        <View style={styles.actions}>
-          <FocusButton label="Save" primary onPress={save} />
-          {!firstRun ? <FocusButton label="Cancel" onPress={onCancel} /> : null}
+        <Text style={s.note}>
+          Flight routes, operator names and photos appear when provided by your
+          feed. No account or global flight service is required.
+        </Text>
+        {!!error && (
+          <Text
+            accessibilityRole="alert"
+            style={{color: '#ff9c8c', fontSize: 20, marginTop: 16}}>
+            {error}
+          </Text>
+        )}
+        <View style={s.actions}>
+          <TVButton label="Save settings" onPress={save} primary />
+          <TVButton label="Cancel" onPress={onCancel} />
         </View>
       </View>
+    </ScrollView>
+  );
+}
+function Field({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={s.field}>
+      <View style={{width: '40%', paddingRight: 35}}>
+        <Text style={s.fieldTitle}>{title}</Text>
+        <Text style={s.hint}>{hint}</Text>
+      </View>
+      <View style={s.controls}>{children}</View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: theme.space.xl,
-  },
+const s = StyleSheet.create({
+  root: {flex: 1},
+  content: {alignItems: 'center', paddingVertical: 12},
   card: {
-    width: '78%',
-    maxWidth: 1100,
-    backgroundColor: theme.color.panel,
-    borderColor: theme.color.panelBorder,
+    width: 1280,
+    padding: 40,
+    borderRadius: 24,
+    backgroundColor: '#101824',
     borderWidth: 1,
-    borderRadius: theme.radius,
-    padding: theme.space.xl,
+    borderColor: '#253142',
   },
-  title: {
-    color: theme.color.text,
-    fontSize: theme.font.title,
-    fontWeight: '700',
-  },
-  subtitle: {
-    color: theme.color.textMuted,
-    fontSize: theme.font.small,
-    marginTop: theme.space.xs,
-    marginBottom: theme.space.lg,
-  },
+  eyebrow: {color: '#21df98', letterSpacing: 3, fontSize: 15},
+  title: {fontSize: 42, color: '#edf4f8', fontWeight: '600', marginTop: 10},
+  subtitle: {fontSize: 21, color: '#96a7b6', marginTop: 12, marginBottom: 24},
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.space.sm,
-    borderTopColor: theme.color.panelBorder,
+    paddingVertical: 22,
+    borderTopColor: '#253142',
     borderTopWidth: 1,
   },
-  fieldLabelBlock: {
-    width: '38%',
-    paddingRight: theme.space.md,
-  },
-  fieldLabel: {
-    color: theme.color.text,
-    fontSize: theme.font.body,
-    fontWeight: '600',
-  },
-  fieldHint: {
-    color: theme.color.textMuted,
-    fontSize: theme.font.small,
-    marginTop: 2,
-  },
-  fieldControl: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: theme.color.background,
-    borderColor: theme.color.panelBorder,
-    borderWidth: 2,
-    borderRadius: theme.radius,
-    paddingVertical: theme.space.sm,
-    paddingHorizontal: theme.space.md,
-    marginRight: theme.space.sm,
-    marginVertical: theme.space.xs,
-  },
-  buttonSelected: {
-    backgroundColor: theme.color.selected,
-    borderColor: theme.color.accent,
-  },
-  buttonPrimary: {
-    backgroundColor: theme.color.accent,
-    borderColor: theme.color.accent,
-  },
-  buttonFocused: {
-    borderColor: theme.color.focusBorder,
-  },
-  buttonText: {
-    color: theme.color.textMuted,
-    fontSize: theme.font.small,
-    fontWeight: '600',
-  },
-  buttonTextStrong: {
-    color: theme.color.text,
-  },
+  fieldTitle: {fontSize: 24, color: '#e8eff5'},
+  hint: {fontSize: 17, lineHeight: 23, color: '#8c9dab', marginTop: 7},
+  controls: {flex: 1, flexDirection: 'row', gap: 12},
   input: {
     flex: 1,
-    minWidth: 320,
-    color: theme.color.text,
-    fontSize: theme.font.body,
-    backgroundColor: theme.color.background,
-    borderColor: theme.color.panelBorder,
+    minWidth: 100,
+    backgroundColor: '#090f17',
     borderWidth: 2,
-    borderRadius: theme.radius,
-    paddingVertical: theme.space.sm,
-    paddingHorizontal: theme.space.md,
-    marginVertical: theme.space.xs,
+    borderColor: '#375349',
+    borderRadius: 10,
+    color: '#e4f0ea',
+    padding: 16,
+    fontSize: 22,
   },
-  inputFocused: {
-    borderColor: theme.color.focusBorder,
-  },
-  actions: {
-    flexDirection: 'row',
-    marginTop: theme.space.lg,
-    paddingTop: theme.space.md,
-    borderTopColor: theme.color.panelBorder,
-    borderTopWidth: 1,
-  },
+  note: {color: '#95ad9e', fontSize: 18, lineHeight: 26},
+  actions: {flexDirection: 'row', gap: 16, marginTop: 28},
 });

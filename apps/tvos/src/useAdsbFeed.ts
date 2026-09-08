@@ -1,5 +1,4 @@
 import {useEffect, useMemo, useState} from 'react';
-
 import {
   createPiAwareClient,
   filterAndSortAircraft,
@@ -10,10 +9,8 @@ import {
   type TrackingState,
   type TrackedAircraft,
 } from '@adsb/shared';
-
 import type {AppConfig} from './config';
 import {createDemoFetch} from './demoFeed';
-
 export interface FeedState {
   loading: boolean;
   error?: string;
@@ -22,78 +19,108 @@ export interface FeedState {
   allAircraft: TrackedAircraft[];
   aircraft: TrackedAircraft[];
 }
-
-// Port of the web app's useAdsbFeed, using the same shared PiAware client and
-// tracker. In demo mode the client is fed a synthetic fetch implementation so
-// the simulator shows live-looking traffic without a real feeder.
-export function useAdsbFeed(config: AppConfig, filters: AircraftFilters): FeedState {
-  const [trackingState, setTrackingState] = useState<TrackingState>();
-  const [error, setError] = useState<string>();
-  const [loading, setLoading] = useState(true);
-
-  const client = useMemo(
-    () =>
-      createPiAwareClient({
-        mode: config.mode,
-        baseUrl: config.baseUrl,
-        fetchImpl: config.demo ? createDemoFetch() : undefined,
-      }),
-    [config.baseUrl, config.mode, config.demo],
-  );
-
+export function useAdsbFeed(
+  config: AppConfig,
+  filters: AircraftFilters,
+): FeedState {
+  const [state, setState] = useState<{
+    tracking?: TrackingState;
+    error?: string;
+    loading: boolean;
+  }>({loading: true});
   useEffect(() => {
     let cancelled = false;
-
+    let timer: ReturnType<typeof setTimeout>;
+    let previous: TrackingState | undefined;
+    let receiver: LatLon | undefined;
+    setState({loading: true});
+    const client = createPiAwareClient({
+      mode: config.mode,
+      baseUrl: config.baseUrl,
+      fetchImpl: config.demo ? createDemoFetch() : undefined,
+    });
     const poll = async () => {
       try {
-        const [snapshot, receiverPayload] = await Promise.all([
-          client.getAircraftSnapshot(),
-          client.getReceiver(),
-        ]);
-
-        if (cancelled) {
-          return;
+        const snapshot = await client.getAircraftSnapshot();
+        if (!receiver) {
+          try {
+            receiver = receiverFromPayload(await client.getReceiver());
+          } catch {
+            /* Receiver metadata must not block aircraft. */
+          }
+          if (
+            !receiver &&
+            Number.isFinite(config.latitude) &&
+            Number.isFinite(config.longitude)
+          )
+            receiver = {lat: config.latitude!, lon: config.longitude!};
         }
-
-        setTrackingState((previous) =>
-          mergeTrackingState(
-            previous,
-            snapshot,
-            {staleAfterMs: 20_000, maxTrailPoints: 24},
-            receiverFromPayload(receiverPayload),
-          ),
+        if (cancelled) return;
+        previous = mergeTrackingState(
+          previous,
+          snapshot,
+          {staleAfterMs: 20000, maxTrailPoints: 90},
+          receiver,
         );
-        setError(undefined);
-      } catch (caughtError) {
-        if (!cancelled) {
-          setError(caughtError instanceof Error ? caughtError.message : 'Failed to read PiAware feed');
-        }
+        const delayed = Date.now() - snapshot.sourceTimestampMs > 20000;
+        if (delayed)
+          previous = {
+            ...previous,
+            aircraft: previous.aircraft.map(p => ({...p, stale: true})),
+          };
+        setState({
+          tracking: previous,
+          loading: false,
+          error: delayed
+            ? 'Receiver data is more than 20 seconds old'
+            : undefined,
+        });
+      } catch (error) {
+        if (!cancelled)
+          setState({
+            tracking: previous
+              ? {
+                  ...previous,
+                  aircraft: previous.aircraft.map(p => ({...p, stale: true})),
+                }
+              : undefined,
+            loading: false,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Could not reach your receiver',
+          });
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) timer = setTimeout(poll, config.pollMs);
       }
     };
-
     void poll();
-    const timerId = setInterval(() => {
-      void poll();
-    }, config.pollMs);
-
     return () => {
       cancelled = true;
-      clearInterval(timerId);
+      client.dispose();
+      clearTimeout(timer);
     };
-  }, [client, config.pollMs]);
-
-  const allAircraft = useMemo(() => trackingState?.aircraft ?? [], [trackingState?.aircraft]);
-  const aircraft = useMemo(() => filterAndSortAircraft(allAircraft, filters), [allAircraft, filters]);
-
+  }, [
+    config.baseUrl,
+    config.mode,
+    config.demo,
+    config.pollMs,
+    config.latitude,
+    config.longitude,
+  ]);
+  const allAircraft = useMemo(
+    () => state.tracking?.aircraft ?? [],
+    [state.tracking],
+  );
+  const aircraft = useMemo(
+    () => filterAndSortAircraft(allAircraft, filters),
+    [allAircraft, filters],
+  );
   return {
-    loading,
-    error,
-    asOfMs: trackingState?.asOfMs,
-    receiver: trackingState?.receiver,
+    loading: state.loading,
+    error: state.error,
+    asOfMs: state.tracking?.asOfMs,
+    receiver: state.tracking?.receiver,
     allAircraft,
     aircraft,
   };

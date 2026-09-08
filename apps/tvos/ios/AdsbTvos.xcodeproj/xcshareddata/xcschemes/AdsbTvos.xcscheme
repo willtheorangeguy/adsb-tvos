@@ -38,6 +38,16 @@
                ReferencedContainer = "container:AdsbTvos.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B4E4D853F6AF89945A2CE061"
+               BuildableName = "AdsbTvosUITests.xctest"
+               BlueprintName = "AdsbTvosUITests"
+               ReferencedContainer = "container:AdsbTvos.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

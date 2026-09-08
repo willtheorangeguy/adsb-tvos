@@ -1,20 +1,7 @@
-# Web preview app
+# ADS-B TV browser preview
 
-Windows-first preview for ADS-B map + tracking features.
+Runs the actual native TV components with React Native Web. The 1920 × 1080 interface scales to the browser window and supports mouse, Tab, arrow keys, Enter and Escape.
 
-## Run
+From the root, run `npm run setup`, then `npm run preview:tv`. Native JavaScript dependencies are required for shared component typechecking, but Xcode is not required for the browser.
 
-1. Copy `.env.example` to `.env.local` and update values if needed.
-2. Start proxy (optional but recommended):
-   - `npm run dev:proxy`
-3. Start web app:
-   - `npm run dev:web`
-
-## Implemented features
-
-- Live PiAware polling
-- Aircraft marker map with heading vectors and motion trails
-- Receiver marker
-- Search + sort + position filter
-- Aircraft list and detail panel
-- Keyboard directional navigation (remote-like behavior)
+[Full instructions](../../docs/local-preview.md)

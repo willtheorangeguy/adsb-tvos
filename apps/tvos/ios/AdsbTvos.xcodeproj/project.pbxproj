@@ -12,13 +12,22 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		6DF54CFE94862C4FB896FB49 /* RemoteNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5659704E0A170F0B32862E9D /* RemoteNavigationTests.swift */; };
 		7699B88040F8A987B510C191 /* libPods-AdsbTvos-AdsbTvosTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-AdsbTvos-AdsbTvosTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A49FE06E4944C38FF6A5CC94 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48B423D3C34AC331176F4694 /* Foundation.framework */; };
 		A625E931BB026C4466A0ADA6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		00E356F41AD99517003FC87E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteInfo = AdsbTvos;
+		};
+		B1ED298906FE9AEEE59D20E1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
@@ -40,10 +49,13 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = AdsbTvos/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-AdsbTvos-AdsbTvosTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AdsbTvos-AdsbTvosTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-AdsbTvos.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdsbTvos.debug.xcconfig"; path = "Target Support Files/Pods-AdsbTvos/Pods-AdsbTvos.debug.xcconfig"; sourceTree = "<group>"; };
+		48B423D3C34AC331176F4694 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		5659704E0A170F0B32862E9D /* RemoteNavigationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RemoteNavigationTests.swift; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-AdsbTvos.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdsbTvos.release.xcconfig"; path = "Target Support Files/Pods-AdsbTvos/Pods-AdsbTvos.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-AdsbTvos-AdsbTvosTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdsbTvos-AdsbTvosTests.debug.xcconfig"; path = "Target Support Files/Pods-AdsbTvos-AdsbTvosTests/Pods-AdsbTvos-AdsbTvosTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-AdsbTvos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AdsbTvos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AdsbTvos/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		86B028F495AE5E2510A3778B /* AdsbTvosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdsbTvosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-AdsbTvos-AdsbTvosTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdsbTvos-AdsbTvosTests.release.xcconfig"; path = "Target Support Files/Pods-AdsbTvos-AdsbTvosTests/Pods-AdsbTvos-AdsbTvosTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -54,6 +66,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				7699B88040F8A987B510C191 /* libPods-AdsbTvos-AdsbTvosTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E1F223BEB1FB8A5DBF5468 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A49FE06E4944C38FF6A5CC94 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,14 +119,32 @@
 			name = AdsbTvos;
 			sourceTree = "<group>";
 		};
+		27D18E2FDCE6B4A9FC874B2F /* tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				48B423D3C34AC331176F4694 /* Foundation.framework */,
+			);
+			name = tvOS;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-AdsbTvos.a */,
 				19F6CBCC0A4E27FBF8BF4A61 /* libPods-AdsbTvos-AdsbTvosTests.a */,
+				27D18E2FDCE6B4A9FC874B2F /* tvOS */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4713D9C9E1D4C2BA24F43D45 /* AdsbTvosUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5659704E0A170F0B32862E9D /* RemoteNavigationTests.swift */,
+			);
+			name = AdsbTvosUITests;
+			path = AdsbTvosUITests;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -125,6 +163,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				4713D9C9E1D4C2BA24F43D45 /* AdsbTvosUITests */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -136,6 +175,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* AdsbTvos.app */,
 				00E356EE1AD99517003FC87E /* AdsbTvosTests.xctest */,
+				86B028F495AE5E2510A3778B /* AdsbTvosUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -196,6 +236,24 @@
 			productReference = 13B07F961A680F5B00A75B9A /* AdsbTvos.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B4E4D853F6AF89945A2CE061 /* AdsbTvosUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3B1468814E4A5EEBD7C35EBB /* Build configuration list for PBXNativeTarget "AdsbTvosUITests" */;
+			buildPhases = (
+				1D585C000F2C39C2BC891CCB /* Sources */,
+				08E1F223BEB1FB8A5DBF5468 /* Frameworks */,
+				C394254C5CF539064A047B7B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D5BB377110B624856AF42D30 /* PBXTargetDependency */,
+			);
+			name = AdsbTvosUITests;
+			productName = AdsbTvosUITests;
+			productReference = 86B028F495AE5E2510A3778B /* AdsbTvosUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -228,6 +286,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* AdsbTvos */,
 				00E356ED1AD99517003FC87E /* AdsbTvosTests */,
+				B4E4D853F6AF89945A2CE061 /* AdsbTvosUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -247,6 +306,13 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				A625E931BB026C4466A0ADA6 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C394254C5CF539064A047B7B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +467,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1D585C000F2C39C2BC891CCB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DF54CFE94862C4FB896FB49 /* RemoteNavigationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -408,6 +482,12 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* AdsbTvos */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+		};
+		D5BB377110B624856AF42D30 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AdsbTvos;
+			target = 13B07F861A680F5B00A75B9A /* AdsbTvos */;
+			targetProxy = B1ED298906FE9AEEE59D20E1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -514,6 +594,22 @@
 				PRODUCT_NAME = AdsbTvos;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		777DACE7AAAB3BA10D3C8A6F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.adsbtv.RemoteTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = AdsbTvos;
+				TVOS_DEPLOYMENT_TARGET = 15.1;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -669,6 +765,21 @@
 			};
 			name = Release;
 		};
+		FB968106772E1831619C9F94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.adsbtv.RemoteTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = AdsbTvos;
+				TVOS_DEPLOYMENT_TARGET = 15.1;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -686,6 +797,15 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3B1468814E4A5EEBD7C35EBB /* Build configuration list for PBXNativeTarget "AdsbTvosUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				777DACE7AAAB3BA10D3C8A6F /* Release */,
+				FB968106772E1831619C9F94 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,79 +1,23 @@
-import cors from "cors";
-import dotenv from "dotenv";
-import express from "express";
-
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import {createPiAwareClient} from '@adsb/shared';
 dotenv.config();
-
 const app = express();
 const port = Number(process.env.PORT ?? 7070);
-const baseUrl = process.env.PIAWARE_BASE_URL ?? "http://piaware.local";
-
+const baseUrl = process.env.PIAWARE_BASE_URL ?? 'http://piaware.local';
+const client = createPiAwareClient({baseUrl, mode: 'direct'});
 app.use(cors());
-
-function buildUrl(path: string): string {
-  return `${baseUrl.replace(/\/$/, "")}${path}`;
-}
-
-async function readPiAwareJson(path: string): Promise<unknown> {
-  const response = await fetch(buildUrl(path), {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`PiAware request failed (${response.status}) for ${path}`);
-  }
-
-  return response.json();
-}
-
-app.get("/", (_req, res) => {
-  res.json({
-    name: "PiAware proxy",
-    upstream: baseUrl,
-    endpoints: ["/api/health", "/api/aircraft", "/api/receiver", "/api/history"],
-  });
+app.get('/', (_req, res) => res.json({name: 'Local ADS-B receiver proxy', upstream: baseUrl, endpoints: ['/api/health', '/api/aircraft', '/api/receiver', '/api/history']}));
+app.get('/api/health', (_req, res) => res.json({ok: true, upstream: baseUrl}));
+app.get('/api/aircraft', async (_req, res, next) => {
+  try {const snapshot = await client.getAircraftSnapshot(); res.json({now: snapshot.sourceTimestampMs / 1000, aircraft: snapshot.aircraft});} catch (error) {next(error);}
 });
-
-app.get("/api/health", (_req, res) => {
-  res.json({
-    ok: true,
-    upstream: baseUrl,
-  });
+app.get('/api/receiver', async (_req, res, next) => {
+  try {res.json(await client.getReceiver() ?? {});} catch (error) {next(error);}
 });
-
-app.get("/api/aircraft", async (_req, res, next) => {
-  try {
-    res.json(await readPiAwareJson("/skyaware/data/aircraft.json"));
-  } catch (error) {
-    next(error);
-  }
+app.get('/api/history', async (_req, res, next) => {
+  try {const history = await client.getHistory(); if (history === undefined) res.status(404).json({error: 'Receiver history unavailable'}); else res.json(history);} catch (error) {next(error);}
 });
-
-app.get("/api/receiver", async (_req, res, next) => {
-  try {
-    res.json(await readPiAwareJson("/skyaware/data/receiver.json"));
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.get("/api/history", async (_req, res, next) => {
-  try {
-    res.json(await readPiAwareJson("/skyaware/data/history_0.json"));
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  const message = error instanceof Error ? error.message : "Unknown proxy error";
-  res.status(502).json({
-    error: message,
-  });
-});
-
-app.listen(port, () => {
-  console.log(`PiAware proxy listening on http://localhost:${port}`);
-});
+app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {res.status(502).json({error: error instanceof Error ? error.message : 'Unknown receiver error'});});
+app.listen(port, '127.0.0.1', () => console.log(`Local receiver proxy listening on http://127.0.0.1:${port}`));

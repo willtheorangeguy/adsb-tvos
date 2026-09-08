@@ -12,12 +12,19 @@
     "dev": "npm run dev --workspace @adsb/web",
     "dev:web": "npm run dev --workspace @adsb/web",
     "dev:proxy": "npm run dev --workspace @adsb/piaware-proxy",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace @adsb/shared && npm run build --workspace @adsb/web && npm run build --workspace @adsb/piaware-proxy",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run build --workspace @adsb/shared && npm run typecheck --workspaces --if-present",
+    "setup": "npm ci && npm ci --prefix apps/tvos && npm run build --workspace @adsb/shared",
+    "test:e2e": "playwright test",
+    "preview:tv": "node scripts/preview.mjs",
+    "tv:run": "bash scripts/run-tv.sh"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

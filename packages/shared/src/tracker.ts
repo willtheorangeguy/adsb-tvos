@@ -11,13 +11,13 @@ import type {
 const FEET_PER_NM = 6076.12;
 
 function toPosition(record: PiAwareAircraftRecord): LatLon | undefined {
-  if (typeof record.lat !== "number" || typeof record.lon !== "number") {
+  if (!Number.isFinite(record.lat) || !Number.isFinite(record.lon) || Math.abs(record.lat ?? 91) > 90 || Math.abs(record.lon ?? 181) > 180) {
     return undefined;
   }
 
   return {
-    lat: record.lat,
-    lon: record.lon,
+    lat: record.lat!,
+    lon: record.lon!,
   };
 }
 
@@ -36,7 +36,7 @@ function toTrackPoint(position: LatLon, timestampMs: number): AircraftTrackPoint
   };
 }
 
-function distanceNm(from: LatLon, to: LatLon): number {
+export function distanceNm(from: LatLon, to: LatLon): number {
   const toRad = (value: number): number => (value * Math.PI) / 180;
   const earthRadiusNm = 3440.065;
 
@@ -89,10 +89,17 @@ export function mergeTrackingState(
 
     const tracked: TrackedAircraft = {
       hex,
-      callsign: record.flight?.trim() || undefined,
+      callsign: record.flight?.trim() || prior?.callsign,
       squawk: record.squawk || undefined,
-      registration: record.reg || undefined,
-      category: record.category || undefined,
+      registration: record.reg || record.r || prior?.registration,
+      aircraftType: record.t || prior?.aircraftType,
+      operator: record.operator,
+      description: record.description,
+      origin: record.origin,
+      destination: record.destination,
+      photoUrl: record.photo_url,
+      photoCredit: record.photo_credit,
+      category: record.category || prior?.category,
       position,
       altitudeFt: toAltitudeFt(record.alt_baro),
       groundSpeedKt: record.gs,
@@ -103,7 +110,7 @@ export function mergeTrackingState(
       messages: record.messages,
       ageSeconds,
       lastSeenMs,
-      stale: snapshot.sourceTimestampMs - lastSeenMs > staleAfterMs,
+      stale: snapshot.sourceTimestampMs - lastSeenMs > staleAfterMs || (record.seen_pos ?? 0) * 1000 > staleAfterMs,
       trail: nextTrail(prior?.trail ?? [], position, snapshot.sourceTimestampMs, maxTrailPoints),
     };
 

@@ -1,173 +1,83 @@
-import { useEffect, useMemo, useState } from "react";
-
-import type { AircraftFilters, SortField } from "@adsb/shared";
-
-import { AircraftDetails } from "./components/AircraftDetails";
-import { AircraftTable } from "./components/AircraftTable";
-import { FlightMap } from "./components/FlightMap";
-import { readConfig } from "./config";
-import { useAdsbFeed } from "./hooks/useAdsbFeed";
+import { useEffect, useRef } from "react";
+import TVApp from "../../tvos/App";
 import "./App.css";
-
-const config = readConfig();
-
-function App() {
-  const [selectedHex, setSelectedHex] = useState<string>();
-  const [searchText, setSearchText] = useState("");
-  const [requirePosition, setRequirePosition] = useState(true);
-  const [sortBy, setSortBy] = useState<SortField>("distance");
-
-  const filters = useMemo<AircraftFilters>(
-    () => ({
-      searchText,
-      requirePosition,
-      sortBy,
-      sortDirection: "asc",
-    }),
-    [requirePosition, searchText, sortBy],
-  );
-
-  const feed = useAdsbFeed(config, filters);
-
-  const effectiveSelectedHex = useMemo(() => {
-    if (!feed.aircraft.length) {
-      return undefined;
-    }
-
-    if (!selectedHex || !feed.aircraft.some((plane) => plane.hex === selectedHex)) {
-      return feed.aircraft[0]?.hex;
-    }
-
-    return selectedHex;
-  }, [feed.aircraft, selectedHex]);
-
+export default function App() {
+  const stage = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const resize = () => {
+      const scale = Math.min(
+        window.innerWidth / 1920,
+        window.innerHeight / 1080
+      );
+      if (stage.current)
+        stage.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    const navigate = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        const back = [
+          ...document.querySelectorAll<HTMLElement>('[role="button"]'),
+        ].find((x) =>
+          ["Cancel", "Back to app"].includes(x.getAttribute("aria-label") ?? "")
+        );
+        (
+          back ?? document.querySelector<HTMLElement>('[aria-label="◎  Radar"]')
+        )?.click();
+        return;
+      }
       if (
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLSelectElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
+        !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
+          event.key
+        ) ||
+        document.activeElement?.tagName === "INPUT" ||
+        event.altKey ||
+        event.metaKey ||
+        event.ctrlKey
+      )
+        return;
+      event.preventDefault();
+      const candidates = [
+        ...document.querySelectorAll<HTMLElement>('[role="button"], input'),
+      ].filter(
+        (el) => el.offsetWidth > 0 && el.getBoundingClientRect().height > 0
+      );
+      const current = document.activeElement as HTMLElement;
+      if (!candidates.includes(current)) {
+        candidates[0]?.focus();
         return;
       }
-
-      if (!feed.aircraft.length || !effectiveSelectedHex) {
-        return;
-      }
-
-      const index = feed.aircraft.findIndex((plane) => plane.hex === effectiveSelectedHex);
-      if (index < 0) {
-        return;
-      }
-
-      if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-        const next = feed.aircraft[Math.min(index + 1, feed.aircraft.length - 1)];
-        if (next) {
-          setSelectedHex(next.hex);
-          event.preventDefault();
-        }
-      }
-
-      if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-        const previous = feed.aircraft[Math.max(index - 1, 0)];
-        if (previous) {
-          setSelectedHex(previous.hex);
-          event.preventDefault();
-        }
-      }
+      const r = current.getBoundingClientRect();
+      const x = r.x + r.width / 2;
+      const y = r.y + r.height / 2;
+      const horizontal =
+        event.key === "ArrowLeft" || event.key === "ArrowRight";
+      const sign =
+        event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
+      const ranked = candidates
+        .filter((el) => el !== current)
+        .map((el) => {
+          const box = el.getBoundingClientRect();
+          const dx = box.x + box.width / 2 - x;
+          const dy = box.y + box.height / 2 - y;
+          const forward = (horizontal ? dx : dy) * sign;
+          const cross = Math.abs(horizontal ? dy : dx);
+          return { el, forward, score: forward + cross * 4 };
+        })
+        .filter((c) => c.forward > 4)
+        .sort((a, b) => a.score - b.score);
+      ranked[0]?.el.focus();
+      ranked[0]?.el.scrollIntoView({ block: "nearest", inline: "nearest" });
     };
-
-    window.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", navigate);
     return () => {
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("keydown", navigate);
     };
-  }, [effectiveSelectedHex, feed.aircraft]);
-
-  const selected = feed.aircraft.find((plane) => plane.hex === effectiveSelectedHex);
-  const asOf = feed.asOfMs ? new Date(feed.asOfMs).toLocaleTimeString() : "--";
-
+  }, []);
   return (
-    <div className="app">
-      <header className="app-header">
-        <div>
-          <h1>ADS-B Local Radar</h1>
-          <p>
-            PiAware source: <code>{config.baseUrl}</code> ({config.mode})
-          </p>
-          <p className="subtle">Remote controls: arrow keys move selection.</p>
-        </div>
-        <div className="status">
-          <div>Visible: {feed.aircraft.length}</div>
-          <div>Total: {feed.allAircraft.length}</div>
-          <div>Updated: {asOf}</div>
-          <div>Poll: {config.pollMs}ms</div>
-        </div>
-      </header>
-
-      <section className="controls">
-        <label>
-          Search
-          <input
-            value={searchText}
-            placeholder="Callsign, hex, registration, squawk"
-            onChange={(event) => {
-              setSearchText(event.target.value);
-            }}
-          />
-        </label>
-
-        <label>
-          Sort
-          <select
-            value={sortBy}
-            onChange={(event) => {
-              setSortBy(event.target.value as SortField);
-            }}
-          >
-            <option value="distance">Distance</option>
-            <option value="altitude">Altitude</option>
-            <option value="speed">Speed</option>
-            <option value="seen">Recent</option>
-            <option value="callsign">Callsign</option>
-          </select>
-        </label>
-
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={requirePosition}
-            onChange={(event) => {
-              setRequirePosition(event.target.checked);
-            }}
-          />
-          Position only
-        </label>
-      </section>
-
-      {feed.error ? <p className="error">{feed.error}</p> : null}
-      {feed.loading && feed.allAircraft.length === 0 ? <p className="loading">Loading feed...</p> : null}
-
-      <main className="layout">
-        <div className="map-column">
-          <FlightMap
-            aircraft={feed.aircraft}
-            selectedHex={effectiveSelectedHex}
-            receiver={feed.receiver}
-            onSelectAircraft={setSelectedHex}
-          />
-        </div>
-
-        <div className="side-column">
-          <AircraftDetails aircraft={selected} />
-          <AircraftTable
-            aircraft={feed.aircraft}
-            selectedHex={effectiveSelectedHex}
-            onSelectAircraft={setSelectedHex}
-          />
-        </div>
-      </main>
+    <div className="tv-stage" ref={stage}>
+      <TVApp />
     </div>
   );
 }
-
-export default App;

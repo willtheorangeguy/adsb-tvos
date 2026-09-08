@@ -8,6 +8,8 @@ export interface AppConfig {
   // PiAware feeder. This lets the tvOS app run in the simulator (which has no
   // access to a local feeder) with a populated, animated UI.
   demo: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 // Defaults used the first time the app runs, before the user saves settings.

@@ -2,14 +2,14 @@
 // viewed from across a room, so type and touch targets are deliberately large.
 export const theme = {
   color: {
-    background: '#0b1220',
-    panel: '#111c2e',
-    panelBorder: '#1f2f47',
-    focusBorder: '#f59e0b',
-    selected: '#1d2f4d',
+    background: '#070b10',
+    panel: '#101824',
+    panelBorder: '#253142',
+    focusBorder: '#22e69d',
+    selected: '#123529',
     text: '#e5edf7',
-    textMuted: '#8aa0bd',
-    accent: '#2563eb',
+    textMuted: '#8998aa',
+    accent: '#16d995',
     receiver: '#18c964',
     stale: '#64748b',
     error: '#f87171',

@@ -24,20 +24,21 @@ const CALLSIGNS = [
   ['JBU615', 'A2C3E4', 'N615JB', 'A320'],
   ['SKW5490', 'B5D6F7', 'N5490', 'E75L'],
   ['ACA795', 'C8A9B1', 'C-FANG', 'B788'],
-  ['NKS440', 'D3E4F5', 'N440NK', 'A20N'],
+  ['N172SP', 'D3E4F5', 'N172SP', 'C172'],
   ['HAL22', 'E6A7B8', 'N22HA', 'A332'],
-  ['VOI901', 'F9C1D2', 'XA-VOI', 'A321'],
+  ['N407SF', 'F9C1D2', 'N407SF', 'B407'],
 ];
 
 function seededPlanes(): DemoPlane[] {
-  return CALLSIGNS.map(([flight, hex, reg, category], index) => {
+  return CALLSIGNS.map(([flight, hex, reg, type], index) => {
     const bearing = (index / CALLSIGNS.length) * 360;
-    const rangeNm = 6 + (index % 5) * 8;
+    const rangeNm = 10 + (index % 4) * 5;
     const bearingRad = (bearing * Math.PI) / 180;
     const lat = RECEIVER.lat + (rangeNm * Math.cos(bearingRad)) / 60;
     const lon =
       RECEIVER.lon +
-      (rangeNm * Math.sin(bearingRad)) / (60 * Math.cos((RECEIVER.lat * Math.PI) / 180));
+      (rangeNm * Math.sin(bearingRad)) /
+        (60 * Math.cos((RECEIVER.lat * Math.PI) / 180));
 
     return {
       lat,
@@ -46,12 +47,57 @@ function seededPlanes(): DemoPlane[] {
         hex,
         flight,
         reg,
-        category,
+        t: type,
+        category: index === 11 ? 'A7' : index === 9 ? 'A1' : 'A3',
+        operator: [
+          'United Airlines',
+          'Southwest Airlines',
+          'Delta Air Lines',
+          'Alaska Airlines',
+          'American Airlines',
+          'FedEx Express',
+          'JetBlue Airways',
+          'SkyWest Airlines',
+          'Air Canada',
+          'Private owner',
+          'Hawaiian Airlines',
+          'Bay Helicopters',
+        ][index],
+        origin: [
+          'SFO',
+          'OAK',
+          'JFK',
+          'SEA',
+          'DFW',
+          'MEM',
+          'BOS',
+          'LAX',
+          'YVR',
+          'SJC',
+          'HNL',
+          'HWD',
+        ][index],
+        destination: [
+          'DEN',
+          'LAS',
+          'SFO',
+          'SFO',
+          'SFO',
+          'OAK',
+          'SFO',
+          'SFO',
+          'SFO',
+          'MRY',
+          'SFO',
+          'SFO',
+        ][index],
         squawk: (1200 + index * 7).toString().padStart(4, '0'),
-        alt_baro: 8_000 + index * 2_500,
-        gs: 240 + ((index * 37) % 200),
+        alt_baro:
+          index === 9 ? 4500 : index === 11 ? 1800 : 8_000 + index * 2_500,
+        gs: index === 9 ? 110 : index === 11 ? 95 : 240 + ((index * 37) % 200),
         track: (bearing + 90) % 360,
-        baro_rate: index % 3 === 0 ? 1_200 : index % 3 === 1 ? -800 : 0,
+        baro_rate:
+          index >= 9 ? 0 : index % 3 === 0 ? 1_200 : index % 3 === 1 ? -800 : 0,
         rssi: -6 - (index % 8),
         messages: 500 + index * 120,
         seen: 0,
@@ -76,14 +122,21 @@ export function createDemoFetch(): typeof fetch {
       const trackRad = (track * Math.PI) / 180;
       plane.lat += (distanceNm * Math.cos(trackRad)) / 60;
       plane.lon +=
-        (distanceNm * Math.sin(trackRad)) / (60 * Math.cos((plane.lat * Math.PI) / 180));
+        (distanceNm * Math.sin(trackRad)) /
+        (60 * Math.cos((plane.lat * Math.PI) / 180));
 
       // Gently curve the tracks so trails are visible and the scene stays lively.
       plane.record.track = (track + dtSeconds * 1.5) % 360;
 
-      const altitude = typeof plane.record.alt_baro === 'number' ? plane.record.alt_baro : 10_000;
+      const altitude =
+        typeof plane.record.alt_baro === 'number'
+          ? plane.record.alt_baro
+          : 10_000;
       const rate = plane.record.baro_rate ?? 0;
-      plane.record.alt_baro = Math.max(1_000, altitude + (rate * dtSeconds) / 60);
+      plane.record.alt_baro = Math.max(
+        1_000,
+        altitude + (rate * dtSeconds) / 60,
+      );
       plane.record.lat = plane.lat;
       plane.record.lon = plane.lon;
       plane.record.seen = Math.random() * 1.5;
@@ -103,7 +156,11 @@ export function createDemoFetch(): typeof fetch {
     // Match both proxy (/api/receiver) and direct (/skyaware/data/receiver.json)
     // endpoint styles so demo mode works regardless of the connection mode.
     if (url.includes('receiver')) {
-      return respond({lat: RECEIVER.lat, lon: RECEIVER.lon, version: 'demo-1.0'});
+      return respond({
+        lat: RECEIVER.lat,
+        lon: RECEIVER.lon,
+        version: 'demo-1.0',
+      });
     }
 
     if (url.includes('aircraft')) {
@@ -111,11 +168,15 @@ export function createDemoFetch(): typeof fetch {
       return respond({
         now: Date.now() / 1000,
         messages: 100_000,
-        aircraft: planes.map((plane) => ({...plane.record})),
+        aircraft: planes.map(plane => ({...plane.record})),
       });
     }
 
     // history and anything else: behave like the proxy's 404 for unknown paths.
-    return {ok: false, status: 404, json: async () => ({})} as unknown as Response;
+    return {
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    } as unknown as Response;
   }) as typeof fetch;
 }

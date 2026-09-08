@@ -2,7 +2,7 @@
 <h1 align="center">ADS-B TV Viewer</h1>
 
 <!-- Copy -->
-<h4 align="center">An Apple TV ADS-B viewer for your own PiAware feeder — developed and previewed on Windows, released from macOS.</h4>
+<h4 align="center">A Tailvision-inspired Apple TV radar for your own PiAware, dump1090 or readsb receiver — with an interactive Mac/browser preview.</h4>
 
 <!-- Badges -->
 <div align="center">
@@ -26,25 +26,37 @@
 
 ## Key Features
 
-- Live aircraft from your own FlightAware PiAware feeder — no third-party API, no account.
-- A Leaflet map preview that runs in any browser on any OS.
-- An optional local proxy that solves the CORS and mixed-content problems browsers create.
-- Tracking, filtering, and formatting logic shared between the web preview and the tvOS app.
-- A tvOS scaffold for Apple TV, with the shared logic already testable from Windows.
+- Dark, remote-friendly radar with range rings, aircraft selection, trails, optional maps and following.
+- Live aircraft from your own PiAware, dump1090 or readsb receiver; no account or global data service.
+- Overhead bearings, aircraft/type/category watchlists and on-screen nearby alerts.
+- Persistent sightings with QR sharing and browser logbook export.
+- One TV interface shared by the native Apple TV app and the interactive browser preview.
+- Clearly labeled demo traffic for exploring without a receiver.
 
 ## Installation
 
 ```bash
-npm install
-npm run dev:proxy    # optional, recommended for browsers
-npm run dev:web
+npm run setup
+npm run preview:tv
 ```
 
-Then open the Vite URL. See [`docs/quickstart.md`](docs/quickstart.md).
+Or double-click **Open ADS-B TV.command**. The preview opens at **http://127.0.0.1:5173/**.
+
+For the native Apple TV simulator on macOS with Xcode’s tvOS runtime:
+
+```bash
+npm run tv:run
+```
+
+See [local preview instructions](docs/local-preview.md) for prerequisites and controls.
 
 ## Usage
 
-Point the proxy at your feeder's host root, start the web preview, and aircraft appear on the map as your receiver hears them.
+Open **Settings**, choose **Local receiver**, and enter the host root of your feeder. The app discovers common PiAware/dump1090/readsb data paths. Use Direct mode when supported; the included local proxy handles browser CORS otherwise. Add fallback coordinates only if the receiver omits its location.
+
+Explore with arrow keys and Enter, or click in the browser. Select an aircraft to inspect, track, or log it. Alerts run while the app is open. Routes, operators and photos appear only when supplied by the feed; standard ADS-B broadcasts do not contain them.
+
+Read the [Tailvision feature comparison](docs/tailvision-parity.md) for TV adaptations and local-data limitations.
 
 ## Documentation
 
@@ -67,4 +79,4 @@ Data from a local [PiAware](https://flightaware.com/adsb/piaware/) feeder. Built
 
 MIT — see [`LICENSE.md`](LICENSE.md).
 
-> Reads your own receiver on your own network. Nothing is sent anywhere, and no FlightAware account or API key is involved.
+> Reads your own receiver on your own network. No FlightAware account or API key is involved. Optional maps load OpenStreetMap tiles; receiver-provided photos load only when available.

@@ -3,7 +3,16 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["react-native"]
+    "types": [
+      "react-native"
+    ]
   },
-  "include": ["App.tsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "App.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "src/**/*.web.ts"
+  ]
 }
