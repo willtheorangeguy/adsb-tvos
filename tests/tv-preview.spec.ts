@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({page}) => {
   await page.addInitScript(() => {
-    if (!localStorage.getItem('adsb.settings.v2')) localStorage.setItem('adsb.settings.v2', JSON.stringify({demo:true,mode:'direct',baseUrl:'http://piaware.local',pollMs:2000}));
+    if (!localStorage.getItem('adsb.settings.v2')) localStorage.setItem('adsb.settings.v2', JSON.stringify({demo:true,onlineDetails:false,mode:'direct',baseUrl:'http://piaware.local',pollMs:2000}));
   });
 });
 
@@ -148,4 +148,69 @@ test("local readsb feed discovery, missing metadata, persisted settings and disc
   await expect(
     page.getByText("●  RECEIVER CONNECTED", { exact: true })
   ).toBeVisible({ timeout: 10000 });
+});
+
+test('online aircraft identity, credited photo link, failure isolation and local-only setting', async ({page}) => {
+  let photoFailure = false;
+  const requests: string[] = [];
+  await page.addInitScript(() => localStorage.setItem('adsb.settings.v2', JSON.stringify({demo:false,onlineDetails:true,mode:'direct',baseUrl:'http://receiver.test',pollMs:1000,latitude:51.09,longitude:-114.15})));
+  await page.route('http://receiver.test/**', route => route.fulfill({json: route.request().url().endsWith('aircraft.json') ? {now: Date.now()/1000, aircraft: [{hex:'c07f47',flight:'WEN123',lat:51.1,lon:-114.1,alt_baro:8000,gs:200,seen:0,seen_pos:0}]} : {}}));
+  await page.route('https://api.adsbdb.com/**', route => {
+    requests.push(route.request().url());
+    return route.fulfill({json:{response:{aircraft:{mode_s:'C07F47',registration:'C-GWFE',registered_owner:'WestJet Encore',manufacturer:'Bombardier',type:'DHC-8 402',icao_type:'DH8D',lat:0,altitudeFt:99999}}}});
+  });
+  await page.route('https://api.planespotters.net/**', route => {
+    requests.push(route.request().url());
+    return route.fulfill(photoFailure ? {status:503,body:'offline'} : {json:{photos:[{thumbnail_large:{src:'https://t.plnspttrs.net/test.jpg'},photographer:'Test Photographer',link:'https://www.planespotters.net/photo/123?utm_source=api'}]}});
+  });
+  await page.route('https://t.plnspttrs.net/**', route => route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="420" height="280"><rect width="420" height="280" fill="#375349"/></svg>'}));
+  await page.goto('/');
+  await expect(page.getByText('WestJet Encore', {exact:true})).toBeVisible();
+  await expect(page.getByText('Registered owner / operator · adsbdb', {exact:true})).toBeVisible();
+  const link = page.getByRole('link', {name:'Open photo on Planespotters.net · © Test Photographer'});
+  await expect(link).toHaveAttribute('href','https://www.planespotters.net/photo/123?utm_source=api');
+  await expect(link.locator('img')).toBeVisible();
+  await expect(page.getByText('8,000 ft', {exact:true}).last()).toBeVisible();
+  await page.getByRole('button',{name:'＋  Log sighting'}).click();
+  const saved = await page.evaluate(() => localStorage.getItem('adsb.sightings.v1'));
+  expect(saved).not.toContain('plnspttrs');
+  expect(saved).not.toContain('Test Photographer');
+  await page.getByRole('button',{name:'⚙  Settings',exact:true}).click();
+  await page.getByRole('button',{name:'Local only',exact:true}).click();
+  await page.getByRole('button',{name:'Save settings'}).click();
+  await expect(link).toHaveCount(0);
+  const count = requests.length;
+  await page.reload();
+  await expect(page.getByText('Operator not provided', {exact:true})).toBeVisible();
+  expect(requests).toHaveLength(count);
+  photoFailure = true;
+  await page.getByRole('button',{name:'⚙  Settings',exact:true}).click();
+  await page.getByRole('button',{name:'Online details',exact:true}).click();
+  await page.getByRole('button',{name:'Save settings'}).click();
+  await expect(page.getByText('WestJet Encore', {exact:true})).toBeVisible();
+  await expect(page.getByText('Some online details unavailable · Live receiver tracking continues')).toBeAttached();
+  await expect(page.getByText('●  RECEIVER CONNECTED',{exact:true})).toBeVisible();
+});
+
+test('a delayed previous selection cannot overwrite the current aircraft details', async ({page}) => {
+  let release!: () => void;
+  const held = new Promise<void>(resolve => {release = resolve;});
+  await page.addInitScript(() => localStorage.setItem('adsb.settings.v2', JSON.stringify({demo:false,onlineDetails:true,mode:'direct',baseUrl:'http://receiver.test',pollMs:1000,latitude:51.09,longitude:-114.15})));
+  await page.route('http://receiver.test/**', route => route.fulfill({json:route.request().url().endsWith('aircraft.json') ? {now:Date.now()/1000,aircraft:[{hex:'c07f47',flight:'FIRST1',lat:51.1,lon:-114.1,seen:0},{hex:'c080a3',flight:'SECOND2',lat:51.15,lon:-114.15,seen:0}]} : {}}));
+  await page.route('https://api.planespotters.net/**', route => route.fulfill({json:{photos:[]}}));
+  await page.route('https://api.adsbdb.com/**', async route => {
+    const first=route.request().url().endsWith('C07F47');
+    if(first) await held;
+    await route.fulfill({json:{response:{aircraft:{mode_s:first?'C07F47':'C080A3',registered_owner:first?'Old owner':'Current owner'}}}});
+  });
+  const started = page.waitForRequest('https://api.adsbdb.com/v0/aircraft/C07F47');
+  await page.goto('/');
+  await started;
+  await page.getByRole('button', {name:'View SECOND2',exact:true}).click();
+  await expect(page.getByText('Current owner', {exact:true})).toBeVisible();
+  const completed = page.waitForResponse('https://api.adsbdb.com/v0/aircraft/C07F47');
+  release();
+  await completed;
+  await expect(page.getByText('Current owner', {exact:true})).toBeVisible();
+  await expect(page.getByText('Old owner', {exact:true})).toHaveCount(0);
 });

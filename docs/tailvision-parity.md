@@ -9,7 +9,7 @@ ADS-B TV uses the owner’s local PiAware, dump1090, or readsb receiver. It does
 | Live radar | Polling, aircraft selection, heading-oriented aircraft, north-up radar, optional map, recent trails, following/recentering, search and category filters | Only aircraft received by the configured local station; stale signals are distinguished |
 | Range | 30, 75 and 150 nm choices, receiver-centered range rings | Actual reception depends on the antenna; there is no account-based range restriction |
 | Flight details | Callsign, ICAO, registration, type/category, altitude, speed, heading, vertical rate, squawk, position, distance and direction | Fields appear only when supplied; `r` / `t` readsb aliases supported; optional SkyAware local aircraft database fills registration/type when present |
-| Route, operator, photos | Render optional receiver-provided `origin`, `destination`, `operator`, `photo_url` and `photo_credit` | Standard PiAware ADS-B data does not broadcast these. Missing routes/operators are labeled; missing photos use a labeled silhouette. Demo routes/operators are synthetic. No external enrichment is requested |
+| Route, operator, photos | Optional free adsbdb registry details and Planespotters photos with photographer/source links; receiver-supplied operator and routes supported | Online details can be disabled in Settings. Registry ownership is labeled separately from a confirmed operator. Missing photos use a silhouette; routes require receiver data. Demo does not call external APIs |
 | Track and alert | Persistent watch rules for a registration/ICAO address, type code, or category; adjustable 5/15/30 nm alerts | On-screen entry alerts while the app is open; no background push notifications. Type/category rules require receiver metadata |
 | Point and identify | Overhead list within 30 nm, compass bearings, direction and estimated closest approach | Apple TV has no camera, compass or phone AR. This is a TV adaptation, not camera feature parity. Closest approach assumes constant speed/heading |
 | Capture sightings | One-action saving of aircraft telemetry, time, location and recent trail | A telemetry snapshot rather than a camera photograph; up to 500 sightings retained on-device |
@@ -23,7 +23,7 @@ Enter the host root, for example `http://192.168.1.50`. Direct mode discovers th
 
 If the receiver omits coordinates, add its latitude and longitude in Settings. The map can center on the aircraft cluster in the meantime, but distance, range filtering, and overhead direction require a receiver location. Request timeouts, serial polling, stale-position marking, and automatic retries handle outages without labeling cached positions as fresh.
 
-External map tiles come from OpenStreetMap only when Map is enabled. Radar mode needs no map service or API key. Photos, if present in an enriched local feed, are loaded from that feed’s HTTPS photo URL.
+External map tiles come from OpenStreetMap only when Map is enabled. Radar mode needs no map service or API key. Optional online aircraft details use adsbdb and Planespotters.net for selected-aircraft lookups; see [provider details](aircraft-details.md).
 
 ## Validation
 

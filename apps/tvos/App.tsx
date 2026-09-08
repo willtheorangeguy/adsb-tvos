@@ -29,6 +29,7 @@ import {readStored, writeStored} from './src/storage';
 import {downloadFile} from './src/download';
 import {s} from './src/appStyles';
 import {captureMenuButton} from './src/remote';
+import {useAircraftDetails} from './src/useAircraftDetails';
 import {useAdsbFeed} from './src/useAdsbFeed';
 
 type Tab = 'Radar' | 'Overhead' | 'Tracked' | 'Sightings' | 'Coverage';
@@ -122,7 +123,14 @@ export default function App(): React.JSX.Element {
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
-  const selected = aircraft.find(p => p.hex === selectedHex) ?? aircraft[0];
+  const receiverSelected = aircraft.find(p => p.hex === selectedHex) ?? aircraft[0];
+  const details = useAircraftDetails(receiverSelected?.hex, settings.onlineDetails && !settings.demo);
+  const selected = receiverSelected && {
+    ...receiverSelected,
+    registration: receiverSelected.registration || details?.identity?.registration,
+    aircraftType: receiverSelected.aircraftType || details?.identity?.aircraftType,
+    description: receiverSelected.description || details?.identity?.description,
+  };
   const localSightings = sightings.filter(s => s.demo === settings.demo);
   const stale =
     !!feed.error ||
@@ -438,6 +446,8 @@ export default function App(): React.JSX.Element {
               <View style={s.right}>
                 <AircraftDetails
                   aircraft={selected}
+                  details={details}
+                  onlineDetails={settings.onlineDetails && !settings.demo}
                   receiver={feed.receiver}
                   tracked={selectedExactTracked}
                   onTrack={toggleTrack}

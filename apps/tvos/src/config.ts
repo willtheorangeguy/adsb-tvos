@@ -8,6 +8,7 @@ export interface AppConfig {
   // PiAware feeder. This lets the tvOS app run in the simulator (which has no
   // access to a local feeder) with a populated, animated UI.
   demo: boolean;
+  onlineDetails: boolean;
   latitude?: number;
   longitude?: number;
 }
@@ -21,6 +22,7 @@ export const defaultConfig: AppConfig = {
   baseUrl: 'http://piaware.local',
   pollMs: 2_000,
   demo: true,
+  onlineDetails: true,
 };
 
 export const POLL_OPTIONS_MS = [1_000, 2_000, 5_000];

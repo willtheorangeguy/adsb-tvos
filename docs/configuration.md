@@ -53,7 +53,6 @@ currently hold defaults rather than secrets — see
 map smoother and asks more of a Raspberry Pi that is also decoding radio; raising it is
 gentler and makes fast aircraft jump between updates.
 
-## No credentials anywhere
+## Online aircraft details
 
-There is no API key, no account, and no third-party service. The feeder is yours and it is on
-your network — which is the whole reason this project reads it directly.
+Settings → Aircraft details selects **Online details** (default) or **Local only**. Online mode uses adsbdb and Planespotters.net for the selected aircraft’s registry details and photo. Neither requires an API key or account. Live tracking still uses your local receiver. See [providers, privacy and photo attribution](aircraft-details.md).

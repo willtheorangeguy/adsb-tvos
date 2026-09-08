@@ -65,8 +65,6 @@ tvOS.
 
 Only step 4 differs between the two apps.
 
-## No account, no third party
+## Local tracking and optional enrichment
 
-Data comes from a receiver you own, on your network. There is no FlightAware API key, no
-subscription, and nothing leaves the LAN — unlike `flightaware-cli` in this org, which uses
-the paid AeroAPI.
+Live telemetry comes from a receiver you own on your network. A separate selected-aircraft hook optionally uses free adsbdb registry details and Planespotters photos; it never replaces live positions. Settings can disable online details. API failures do not propagate into receiver status. Optional maps also load external tiles. See [aircraft details](aircraft-details.md) for requests, attribution and caching.

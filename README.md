@@ -27,10 +27,11 @@
 ## Key Features
 
 - Dark, remote-friendly radar with range rings, aircraft selection, trails, optional maps and following.
-- Live aircraft from your own PiAware, dump1090 or readsb receiver; no account or global data service.
+- Live aircraft from your own PiAware, dump1090 or readsb receiver; no account or global position feed.
 - Overhead bearings, aircraft/type/category watchlists and on-screen nearby alerts.
 - Persistent sightings with QR sharing and browser logbook export.
 - One TV interface shared by the native Apple TV app and the interactive browser preview.
+- Free optional aircraft registry details and credited photos from adsbdb and Planespotters.net.
 - Clearly labeled demo traffic for exploring without a receiver.
 
 ## Installation
@@ -54,7 +55,7 @@ See [local preview instructions](docs/local-preview.md) for prerequisites and co
 
 Open **Settings**, choose **Local receiver**, and enter the host root of your feeder. The app discovers common PiAware/dump1090/readsb data paths. Use Direct mode when supported; the included local proxy handles browser CORS otherwise. Add fallback coordinates only if the receiver omits its location.
 
-Explore with arrow keys and Enter, or click in the browser. Select an aircraft to inspect, track, or log it. Alerts run while the app is open. Routes, operators and photos appear only when supplied by the feed; standard ADS-B broadcasts do not contain them.
+Explore with arrow keys and Enter, or click in the browser. Select an aircraft to inspect, track, or log it. Alerts run while the app is open. Settings → Aircraft details enables free online registration, model, registered owner/operator and photo lookups. No account is needed. Live positions and any routes still come from your receiver. See [aircraft details and providers](docs/aircraft-details.md).
 
 Read the [Tailvision feature comparison](docs/tailvision-parity.md) for TV adaptations and local-data limitations.
 
@@ -79,4 +80,4 @@ Data from a local [PiAware](https://flightaware.com/adsb/piaware/) feeder. Built
 
 MIT — see [`LICENSE.md`](LICENSE.md).
 
-> Reads your own receiver on your own network. No FlightAware account or API key is involved. Optional maps load OpenStreetMap tiles; receiver-provided photos load only when available.
+> Reads your own receiver on your own network. No FlightAware account or API key is involved. Optional maps load OpenStreetMap tiles; optional online aircraft details use adsbdb and Planespotters.net.

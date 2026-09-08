@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 import type {PiAwareMode} from '@adsb/shared';
 import {POLL_OPTIONS_MS, type AppConfig} from '../config';
 import {TVButton} from './TVButton';
+import {FocusRegion} from './FocusRegion';
 export function SettingsOverlay({
   initial,
   onSave,
@@ -13,6 +14,7 @@ export function SettingsOverlay({
   onSave: (config: AppConfig) => void;
   onCancel: () => void;
 }) {
+  const [onlineDetails, setOnlineDetails] = useState(initial.onlineDetails);
   const [demo, setDemo] = useState(initial.demo);
   const [mode, setMode] = useState<PiAwareMode>(initial.mode);
   const [baseUrl, setBaseUrl] = useState(initial.baseUrl);
@@ -41,6 +43,7 @@ export function SettingsOverlay({
     }
     onSave({
       demo,
+      onlineDetails,
       mode,
       baseUrl: baseUrl.trim().replace(/\/$/, ''),
       pollMs,
@@ -49,96 +52,114 @@ export function SettingsOverlay({
     });
   };
   return (
-    <ScrollView style={s.root} contentContainerStyle={s.content}>
-      <View style={s.card}>
-        <Text style={s.eyebrow}>MAKE YOURSELF AT HOME</Text>
-        <Text style={s.title}>Your receiver. Your sky.</Text>
-        <Text style={s.subtitle}>
-          Connect a PiAware, dump1090 or readsb receiver on your local network.
-        </Text>
-        <Field
-          title="Data source"
-          hint="Demo traffic is synthetic and stays separate from your real sightings.">
-          <TVButton
-            label="Explore demo"
-            active={demo}
-            onPress={() => setDemo(true)}
-          />
-          <TVButton
-            label="Local receiver"
-            active={!demo}
-            onPress={() => setDemo(false)}
-          />
-        </Field>
-        <Field
-          title="Connection"
-          hint="Use Direct on Apple TV. For a browser without feeder CORS, use the local proxy.">
-          <TVButton
-            label="Direct"
-            active={mode === 'direct'}
-            onPress={() => setMode('direct')}
-          />
-          <TVButton
-            label="Local proxy"
-            active={mode === 'proxy'}
-            onPress={() => setMode('proxy')}
-          />
-        </Field>
-        <Field
-          title="Receiver address"
-          hint="Use the host root, e.g. http://192.168.1.50. Proxy default: http://localhost:7070.">
-          <TextInput
-            accessibilityLabel="Receiver address"
-            style={s.input}
-            value={baseUrl}
-            onChangeText={setBaseUrl}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-          />
-        </Field>
-        <Field
-          title="Receiver location"
-          hint="Optional fallback if your receiver hides its location. Enables range and overhead direction.">
-          <TextInput
-            accessibilityLabel="Receiver latitude"
-            placeholder="Latitude"
-            placeholderTextColor="#657788"
-            style={s.input}
-            value={lat}
-            onChangeText={setLat}
-            keyboardType="numbers-and-punctuation"
-          />
-          <TextInput
-            accessibilityLabel="Receiver longitude"
-            placeholder="Longitude"
-            placeholderTextColor="#657788"
-            style={s.input}
-            value={lon}
-            onChangeText={setLon}
-            keyboardType="numbers-and-punctuation"
-          />
-        </Field>
-        <Field
-          title="Refresh interval"
-          hint="Aircraft update while the app is open.">
-          {POLL_OPTIONS_MS.map(ms => (
+    <FocusRegion style={s.root}>
+      <ScrollView style={s.scroll} contentContainerStyle={s.content}>
+        <View style={s.card}>
+          <Text style={s.eyebrow}>MAKE YOURSELF AT HOME</Text>
+          <Text style={s.title}>Your receiver. Your sky.</Text>
+          <Text style={s.subtitle}>
+            Connect a PiAware, dump1090 or readsb receiver on your local
+            network.
+          </Text>
+          <Field
+            title="Data source"
+            hint="Demo traffic is synthetic and stays separate from your real sightings.">
             <TVButton
-              key={ms}
-              label={`${ms / 1000} seconds`}
-              active={pollMs === ms}
-              onPress={() => setPollMs(ms)}
+              label="Explore demo"
+              active={demo}
+              onPress={() => setDemo(true)}
             />
-          ))}
-        </Field>
-        <Text style={s.note}>
-          Flight routes, operator names and photos appear when provided by your
-          feed. No account or global flight service is required.
-        </Text>
+            <TVButton
+              label="Local receiver"
+              active={!demo}
+              onPress={() => setDemo(false)}
+            />
+          </Field>
+          <Field
+            title="Connection"
+            hint="Use Direct on Apple TV. For a browser without feeder CORS, use the local proxy.">
+            <TVButton
+              label="Direct"
+              active={mode === 'direct'}
+              onPress={() => setMode('direct')}
+            />
+            <TVButton
+              label="Local proxy"
+              active={mode === 'proxy'}
+              onPress={() => setMode('proxy')}
+            />
+          </Field>
+          <Field
+            title="Receiver address"
+            hint="Use the host root, e.g. http://192.168.1.50. Proxy default: http://localhost:7070.">
+            <TextInput
+              accessibilityLabel="Receiver address"
+              style={s.input}
+              value={baseUrl}
+              onChangeText={setBaseUrl}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+            />
+          </Field>
+          <Field
+            title="Receiver location"
+            hint="Optional fallback if your receiver hides its location. Enables range and overhead direction.">
+            <TextInput
+              accessibilityLabel="Receiver latitude"
+              placeholder="Latitude"
+              placeholderTextColor="#657788"
+              style={s.input}
+              value={lat}
+              onChangeText={setLat}
+              keyboardType="numbers-and-punctuation"
+            />
+            <TextInput
+              accessibilityLabel="Receiver longitude"
+              placeholder="Longitude"
+              placeholderTextColor="#657788"
+              style={s.input}
+              value={lon}
+              onChangeText={setLon}
+              keyboardType="numbers-and-punctuation"
+            />
+          </Field>
+          <Field
+            title="Refresh interval"
+            hint="Aircraft update while the app is open.">
+            {POLL_OPTIONS_MS.map(ms => (
+              <TVButton
+                key={ms}
+                label={`${ms / 1000} seconds`}
+                active={pollMs === ms}
+                onPress={() => setPollMs(ms)}
+              />
+            ))}
+          </Field>
+          <Field
+            title="Aircraft details"
+            hint="Free · No account or API key required.">
+            <TVButton
+              label="Online details"
+              active={onlineDetails}
+              onPress={() => setOnlineDetails(true)}
+            />
+            <TVButton
+              label="Local only"
+              active={!onlineDetails}
+              onPress={() => setOnlineDetails(false)}
+            />
+          </Field>
+          <Text style={s.note}>
+            Online details sends the selected aircraft’s ICAO hex to adsbdb and
+            Planespotters.net for registry details and credited photos. Your
+            receiver supplies all live positions. No lookups run in demo mode.
+          </Text>
+        </View>
+      </ScrollView>
+      <FocusRegion style={s.footer}>
         {!!error && (
-          <Text
-            accessibilityRole="alert"
-            style={{color: '#ff9c8c', fontSize: 20, marginTop: 16}}>
+          <Text accessibilityRole="alert" style={s.error}>
             {error}
           </Text>
         )}
@@ -146,8 +167,8 @@ export function SettingsOverlay({
           <TVButton label="Save settings" onPress={save} primary />
           <TVButton label="Cancel" onPress={onCancel} />
         </View>
-      </View>
-    </ScrollView>
+      </FocusRegion>
+    </FocusRegion>
   );
 }
 function Field({
@@ -171,6 +192,18 @@ function Field({
 }
 const s = StyleSheet.create({
   root: {flex: 1},
+  scroll: {flex: 1},
+  footer: {
+    width: 1280,
+    alignSelf: 'center',
+    backgroundColor: '#101824',
+    borderRadius: 20,
+    paddingHorizontal: 40,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: '#253142',
+  },
+  error: {color: '#ff9c8c', fontSize: 20, marginBottom: 12},
   content: {alignItems: 'center', paddingVertical: 12},
   card: {
     width: 1280,
@@ -205,5 +238,5 @@ const s = StyleSheet.create({
     fontSize: 22,
   },
   note: {color: '#95ad9e', fontSize: 18, lineHeight: 26},
-  actions: {flexDirection: 'row', gap: 16, marginTop: 28},
+  actions: {flexDirection: 'row', gap: 16, justifyContent: 'flex-end'},
 });

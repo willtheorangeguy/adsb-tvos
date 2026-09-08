@@ -1,14 +1,24 @@
 import React, {useState} from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {
   aircraftCategory,
   formatAltitude,
   formatDistance,
   formatSpeed,
   proximity,
+  qrMatrix,
+  type AircraftDetailsResult,
   type LatLon,
   type TrackedAircraft,
 } from '@adsb/shared';
+import {PhotoThumbnail} from './PhotoThumbnail';
 import {TVButton} from './TVButton';
 export function AircraftDetails({
   aircraft: p,
@@ -17,6 +27,8 @@ export function AircraftDetails({
   onTrack,
   onSave,
   demo,
+  details,
+  onlineDetails,
 }: {
   aircraft?: TrackedAircraft;
   receiver?: LatLon;
@@ -24,6 +36,8 @@ export function AircraftDetails({
   onTrack: () => void;
   onSave: () => void;
   demo: boolean;
+  details?: AircraftDetailsResult;
+  onlineDetails: boolean;
 }): React.JSX.Element {
   const [failedPhoto, setFailedPhoto] = useState<string>();
   if (!p)
@@ -43,6 +57,9 @@ export function AircraftDetails({
     : (p.verticalRateFpm ?? 0) < -200
     ? 'Descending'
     : 'Level flight';
+  const photo = details?.photo;
+  const matrix =
+    photo && Platform.OS !== 'web' ? qrMatrix(photo.link) : undefined;
   return (
     <ScrollView
       style={s.panel}
@@ -52,9 +69,49 @@ export function AircraftDetails({
         <Text style={s.eyebrow}>AIRCRAFT DETAILS</Text>
         <Text style={s.live}>{p.stale ? '○ STALE' : '● IN RANGE'}</Text>
       </View>
-      {p.photoUrl &&
-      /^https:\/\//.test(p.photoUrl) &&
-      p.photoUrl !== failedPhoto ? (
+      {photo && photo.url !== failedPhoto ? (
+        <>
+          <PhotoThumbnail
+            url={photo.url}
+            link={photo.link}
+            credit={photo.credit}
+            onError={() => setFailedPhoto(photo.url)}
+          />
+          <Text style={s.credit}>{photo.credit} · Planespotters.net</Text>
+          {matrix && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 18,
+                marginTop: 12,
+              }}>
+              <View style={{padding: 10, backgroundColor: '#fff'}}>
+                {matrix.map((row, i) => (
+                  <View key={i} style={{flexDirection: 'row'}}>
+                    {row.map((dark, j) => (
+                      <View
+                        key={j}
+                        style={{
+                          width: 2.5,
+                          height: 2.5,
+                          backgroundColor: dark ? '#000' : '#fff',
+                        }}
+                      />
+                    ))}
+                  </View>
+                ))}
+              </View>
+              <Text style={[s.muted, {flex: 1}]}>
+                Scan to view the original photo and photographer on
+                Planespotters.net.
+              </Text>
+            </View>
+          )}
+        </>
+      ) : p.photoUrl &&
+        /^https:\/\//.test(p.photoUrl) &&
+        p.photoUrl !== failedPhoto ? (
         <>
           <Image
             source={{uri: p.photoUrl}}
@@ -83,7 +140,15 @@ export function AircraftDetails({
         <Text style={s.callsign}>{p.callsign || p.hex}</Text>
         <Text style={s.registration}>{p.registration || p.hex}</Text>
       </View>
-      <Text style={s.operator}>{p.operator || 'Operator not provided'}</Text>
+      <Text style={s.operator}>
+        {p.operator ||
+          details?.identity?.registeredOwner ||
+          'Operator not provided'}
+      </Text>
+      {!p.operator && details?.identity?.registeredOwner && (
+        <Text style={s.credit}>Registered owner / operator · adsbdb</Text>
+      )}
+      {!!p.description && <Text style={s.muted}>{p.description}</Text>}
       <View style={s.status}>
         <Text style={s.green}>↗ {phase}</Text>
         <Text style={s.green}>
@@ -174,7 +239,19 @@ export function AircraftDetails({
       <Text style={s.footnote}>
         {demo
           ? 'DEMO · Synthetic aircraft and sample routes'
-          : 'From your receiver · Unavailable fields are not inferred'}
+          : onlineDetails
+          ? !details
+            ? 'Looking up aircraft details…'
+            : details.unavailable
+            ? 'Some online details unavailable · Live receiver tracking continues'
+            : `${
+                details.identity ? 'Registry: adsbdb' : 'No registry entry'
+              } · ${
+                details.photo
+                  ? 'Photo: Planespotters.net'
+                  : 'No photo available'
+              }`
+          : 'From your receiver · Online details off'}
       </Text>
     </ScrollView>
   );
