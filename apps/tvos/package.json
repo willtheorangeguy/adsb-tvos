@@ -21,7 +21,8 @@
     "brace-expansion@2": "2.1.4",
     "fast-xml-parser": "5.7.0",
     "image-size": "npm:image-size-next@1.2.2",
-    "braces": "https://codeload.github.com/FSDevelop/braces/tar.gz/28d440b5dd449dbf1fe6f3506cf94ecca4d02660"
+    "braces": "https://codeload.github.com/FSDevelop/braces/tar.gz/28d440b5dd449dbf1fe6f3506cf94ecca4d02660",
+    "node-forge": "https://codeload.github.com/Krysthyan/forge/tar.gz/ceba34402e329f0365134f23fe19898756527d65"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
