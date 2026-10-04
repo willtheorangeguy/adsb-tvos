@@ -17,8 +17,8 @@
   },
   "overrides": {
     "react-native-tvos": "0.76.0-0",
-    "brace-expansion@1": "1.1.18",
-    "brace-expansion@2": "2.1.4",
+    "brace-expansion@1": "1.1.21",
+    "brace-expansion@2": "2.1.7",
     "fast-xml-parser": "5.7.0",
     "image-size": "npm:image-size-next@1.2.2",
     "braces": "https://codeload.github.com/FSDevelop/braces/tar.gz/28d440b5dd449dbf1fe6f3506cf94ecca4d02660",
