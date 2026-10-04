@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@adsb/shared": "file:../../packages/shared",
+    "braces": "file:vendor/braces",
     "react": "18.3.1",
     "react-native": "npm:react-native-tvos@0.76.0-0"
   },
@@ -21,7 +22,6 @@
     "brace-expansion@2": "2.1.7",
     "fast-xml-parser": "5.7.0",
     "image-size": "npm:image-size-next@1.2.2",
-    "braces": "https://codeload.github.com/FSDevelop/braces/tar.gz/28d440b5dd449dbf1fe6f3506cf94ecca4d02660",
     "node-forge": "https://codeload.github.com/Krysthyan/forge/tar.gz/ceba34402e329f0365134f23fe19898756527d65"
   },
   "devDependencies": {
