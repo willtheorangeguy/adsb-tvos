@@ -1,0 +1,49 @@
+name: Verify merged native tvOS build
+on:
+  push:
+    branches: [codex/verify-native-build-20261013]
+permissions:
+  contents: read
+jobs:
+  native-tvos:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install workspace dependencies
+        run: npm ci
+      - name: Build shared package
+        run: npm run build --workspace @adsb/shared
+      - name: Install native dependencies
+        run: npm ci --prefix apps/tvos
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: apps/tvos
+      - name: Install CocoaPods dependencies
+        working-directory: apps/tvos/ios
+        run: RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
+      - name: Build native tvOS simulator app
+        run: |
+          set -o pipefail
+          xcodebuild -workspace apps/tvos/ios/AdsbTvos.xcworkspace \
+            -scheme AdsbTvos -configuration Debug \
+            -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' \
+            -derivedDataPath /tmp/adsb-native-build \
+            CODE_SIGNING_ALLOWED=NO build > native-build.log 2>&1 || {
+              tail -100 native-build.log
+              exit 1
+            }
+          tail -20 native-build.log
+      - name: Save native build log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-tvos-build-log
+          path: native-build.log
+          if-no-files-found: ignore
