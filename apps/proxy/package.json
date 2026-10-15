@@ -13,7 +13,7 @@
     "@adsb/shared": "^0.1.0",
     "cors": "^2.8.5",
     "dotenv": "^18.0.5",
-    "express": "^5.1.0"
+    "express": "^5.3.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
