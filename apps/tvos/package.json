@@ -22,7 +22,7 @@
     "brace-expansion@2": "2.1.7",
     "fast-xml-parser": "5.7.0",
     "image-size": "npm:image-size-next@1.2.2",
-    "node-forge": "https://codeload.github.com/Krysthyan/forge/tar.gz/ceba34402e329f0365134f23fe19898756527d65"
+    "node-forge": "1.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
